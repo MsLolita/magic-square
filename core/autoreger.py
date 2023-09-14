@@ -50,7 +50,7 @@ class AutoReger:
     def start(self):
         referral_link = REFERRAL
 
-        MagicSquare.referral = referral_link.split('?ref=')[-1]
+        MagicSquare.referral = referral_link.split('/')[-1]
 
         threads = THREADS
 
@@ -89,6 +89,9 @@ class AutoReger:
                     if magic_square.handle_snapshots():
                         logger.debug("Voted on snapshots!")
                         is_ok = True
+
+                if not IS_VERIFY_EMAIL and not IS_SNAPSHOT:
+                    is_ok = True
 
         except Exception as e:
             logger.error(f"Error {e}")

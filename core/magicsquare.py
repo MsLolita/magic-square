@@ -49,8 +49,8 @@ class MagicSquare(Web3Utils, MailUtils, Person):
         self.session = requests.Session()
 
         self.session.headers.update(self.headers)
-        self.session.cookies.update({'referral': MagicSquare.referral})
         self.session.proxies.update({'https': self.proxy, 'http': self.proxy})
+        self.session.cookies.update({'referral': MagicSquare.referral})
 
     @staticmethod
     def get_proxy(proxy: str):
@@ -74,7 +74,7 @@ class MagicSquare(Web3Utils, MailUtils, Person):
     def get_authorization_token(self):
         url = 'https://magic.store/api/magicid/auth/login/wallet'
 
-        msg = f"Confirm authorization in magic.store with your account: {self.acct.address.lower()}"
+        msg = f"Confirm authorization in magic.store with your account: {self.acct.address}"
 
         json_data = {
             'pub_key': self.acct.address.lower(),
@@ -93,7 +93,7 @@ class MagicSquare(Web3Utils, MailUtils, Person):
 
         json_data = {
             'network': 'EVM',
-            'pub_key': self.acct.address.lower(),
+            'pub_key': self.acct.address,
             'wallet': 'EVM',
             'referredBy': MagicSquare.referral,
         }
