@@ -93,7 +93,7 @@ class MagicSquare(Web3Utils, MailUtils, Person):
 
         json_data = {
             'network': 'EVM',
-            'pub_key': self.acct.address,
+            'pub_key': self.acct.address.lower(),
             'wallet': 'EVM',
             'referredBy': MagicSquare.referral,
         }
