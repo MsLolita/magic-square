@@ -1,5 +1,5 @@
 # Magic Square Reger&Voter
-# Main <crypto/> moves: https://t.me/+tdC-PXRzhnczNDli\n
+# Main <crypto/> moves: [@web3_enjoyer_club](https://t.me/+tdC-PXRzhnczNDli)
 
 
 ## Can change params in inputs/config.py 
