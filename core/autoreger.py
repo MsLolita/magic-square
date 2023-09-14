@@ -73,7 +73,7 @@ class AutoReger:
         magic_square = MagicSquare(*account)
         is_ok = False
         logs_file_name = "fail"
-        log_msg = ""
+        log_msg = "Login successful"
 
         try:
             time.sleep(self.custom_user_delay)
@@ -82,12 +82,16 @@ class AutoReger:
                 logger.debug(f"Logged in as {account[0]}")
                 if IS_VERIFY_EMAIL:
                     if magic_square.fill_details():
-                        logger.debug("Email verified!")
+                        msg = " | Email verified!"
+                        log_msg += msg
+                        logger.debug(msg)
                         is_ok = True
 
                 if IS_SNAPSHOT:
                     if magic_square.handle_snapshots():
-                        logger.debug("Voted on snapshots!")
+                        msg = " | Voted on snapshots!"
+                        log_msg += msg
+                        logger.debug(msg)
                         is_ok = True
 
                 if not IS_VERIFY_EMAIL and not IS_SNAPSHOT:
@@ -102,7 +106,7 @@ class AutoReger:
             logs_file_name = "success"
             self.success += 1
         else:
-            log_msg += "Check logs/out.log for more info"
+            log_msg = "Check logs/out.log for more info"
 
         magic_square.logs(logs_file_name, log_msg)
 
