@@ -193,7 +193,7 @@ class MagicSquare(Web3Utils, MailUtils, Person):
     def handle_vote(self, link: str):
         for _ in range(3):
             try:
-                time.sleep(random.uniform(0, 2))
+                time.sleep(random.uniform(5, 10))
                 project_name = link.split("/")[-1]
                 resp_json = self.vote(project_name)
                 logger.debug(f"Vote response ({project_name}): {resp_json}")
