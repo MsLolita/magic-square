@@ -56,7 +56,7 @@ class MagicSquare(Web3Utils, MailUtils, Person):
     def get_proxy(proxy: str):
         if MOBILE_PROXY:
             MagicSquare.change_ip()
-            proxy = MOBILE_PROXY
+            proxy = MOBILE_PROXY.replace("https", "http")
 
         if proxy is not None:
             return f"http://{proxy}"
@@ -137,7 +137,7 @@ class MagicSquare(Web3Utils, MailUtils, Person):
         return self.verify_email()
 
     def send_verify_code(self):
-        url = 'https://magic.store/api/v1/magicid/user/emailCode/send'
+        url = 'https://magic.store/api/v2/magicid/user/email/send-code'
 
         json_data = {
             'email': self.email,
@@ -198,13 +198,34 @@ class MagicSquare(Web3Utils, MailUtils, Person):
                 resp_json = self.vote(project_name)
                 logger.debug(f"Vote response ({project_name}): {resp_json}")
 
-                resp_id = resp_json.get("id")
-                if bool(resp_id):
+                if resp_json.get("success"):
                     return True
             except Exception as e:
                 logger.debug(f"Failed to vote for {link} | {e}")
 
     def vote(self, project_name: str):
+        url = "https://magic.store/api/v2/validation/vote"
+
+        proposal, title = self.get_vote_id(project_name)
+        yes_or_no = random.choice([(1, "yes"), (2, "no")])
+        message = f'Vote ({yes_or_no[1]}) for {title} at Magic Store: {self.acct.address}'
+
+        signature = self.get_signed_code(message)
+
+        json_data = {
+            'vote': yes_or_no[0],
+            'proposal': proposal,
+            'pubKey': self.acct.address.lower(),
+            'network': 'EVM',
+            'message': message,
+            'signature': signature,
+        }
+
+        response = self.session.post(url, json=json_data)
+
+        return response.json()
+
+    def vote_snapshot(self, project_name: str):
         url = 'https://seq.snapshot.org/'
 
         headers = self.session.headers.copy()
@@ -320,13 +341,15 @@ class MagicSquare(Web3Utils, MailUtils, Person):
 
         response = self.session.get(url, params=params)
 
-        return response.json().get("id")
+        res = response.json()
+        return res["id"], res["title"]
 
     def claim_daily_bonus(self):
         pass
 
     def logs(self, file_name: str, msg_result: str = ""):
         acc_id = self.email or self.acct.address
+
         file_msg = f"{acc_id}|{self.acct.key.hex()}|{self.proxy}"
         str_to_file(f"./logs/{file_name}.txt", file_msg)
 
