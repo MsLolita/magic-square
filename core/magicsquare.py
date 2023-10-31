@@ -174,8 +174,24 @@ class MagicSquare(Web3Utils, MailUtils, Person):
 
         return response.json()
 
+    def get_votes_links(self):
+        url = 'https://magic.store/api/v2/store/proposals'
+
+        params = {
+            'offset': '0',
+            'limit': '100',
+            'participation': 'NOT_PARTICIPATED',
+            'proposal': 'ACTIVE',
+        }
+
+        response = self.session.get(url, params=params)
+
+        rows = response.json()["rows"]
+
+        return [f"https://magic.store/app/{row['app_id']}" for row in rows]
+
     def handle_snapshots(self):
-        links = file_to_list(VOTES_LINKS)
+        links = self.get_votes_links()
 
         logger.info(f"{self.email or self.acct.address} starting to vote for {len(links)} projects")
 
