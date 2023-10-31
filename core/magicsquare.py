@@ -21,8 +21,7 @@ from core.utils.file_to_list import file_to_list
 
 from inputs.config import (
     MOBILE_PROXY,
-    MOBILE_PROXY_CHANGE_IP_LINK,
-    VOTES_LINKS
+    MOBILE_PROXY_CHANGE_IP_LINK
 )
 
 

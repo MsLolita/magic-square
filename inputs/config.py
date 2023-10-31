@@ -13,5 +13,3 @@ MOBILE_PROXY_CHANGE_IP_LINK = ""
 EMAILS_FILE_PATH = "inputs/emails.txt"
 KEYS_FILE_PATH = "inputs/private_keys.txt"
 PROXIES_FILE_PATH = "inputs/proxies.txt"
-
-VOTES_LINKS = "inputs/votes_links.txt"
