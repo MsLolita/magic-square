@@ -1,6 +1,7 @@
 import random
 import time
 from random import choice
+from datetime import datetime, timezone
 
 import requests
 from fake_useragent import UserAgent  # pip install fake-useragent
@@ -8,7 +9,7 @@ from bs4 import BeautifulSoup
 from hexbytes import HexBytes
 
 from core.exceptions import NoVerifyMail
-from core.utils import str_to_file, logger
+from core.utils import str_to_file, logger, CaptchaService
 from string import ascii_lowercase, digits
 
 
@@ -17,7 +18,6 @@ from core.utils import (
     MailUtils,
     Person
 )
-from core.utils.file_to_list import file_to_list
 
 from inputs.config import (
     MOBILE_PROXY,
@@ -64,16 +64,32 @@ class MagicSquare(Web3Utils, MailUtils, Person):
     def change_ip():
         requests.get(MOBILE_PROXY_CHANGE_IP_LINK)
 
+    # def check_ip(self):
+    #     print(self.session.get("https://httpbin.org/ip").text)
+
     def login(self):
+        self.session.cookies.update({'MSQ_CONNECTED_WALLET_TYPE': "EVM",
+                                     "MSQ_CONNECTED_WALLET_ADDRESS": self.acct.address})
         self.get_authorization_token()
         resp_json = self.connect_wallet()
         logger.debug(f"Login response: {resp_json}")
         return isinstance(resp_json.get("id"), int)
 
-    def get_authorization_token(self):
-        url = 'https://magic.store/api/magicid/auth/login/wallet'
+    def get_nonce(self):
+        url = 'https://magic.store/api/v2/magicid/nonce'
 
-        msg = f"Confirm authorization in magic.store with your account: {self.acct.address}"
+        headers = self.session.headers
+        headers["x-cf-token"] = CaptchaService().get_captcha_token()
+
+        res = self.session.get(url)
+        return res.text.strip('"')
+
+    def get_authorization_token(self):
+        url = 'https://magic.store/api/v2/magicid/auth/login/wallet'
+
+        msg = (f"magic.store wants you to sign in with your Ethereum account:\n{self.acct.address}\n\n"
+               f"Confirm authorization in magic.store with your account\n\nURI: https://magic.store\nVersion: 1\n"
+               f"Chain ID: 1\nNonce: {self.get_nonce()}\nIssued At: {self.get_formatted_time()}")
 
         json_data = {
             'pub_key': self.acct.address.lower(),
@@ -88,7 +104,7 @@ class MagicSquare(Web3Utils, MailUtils, Person):
         return res.json()
 
     def connect_wallet(self):
-        url = 'https://magic.store/api/magicid/auth/login/wallet/connect'
+        url = 'https://magic.store/api/v2/magicid/user/wallet/connect'
 
         json_data = {
             'network': 'EVM',
@@ -191,6 +207,10 @@ class MagicSquare(Web3Utils, MailUtils, Person):
 
     def handle_snapshots(self):
         links = self.get_votes_links()
+
+        if not links:
+            logger.info(f"No projects to vote for | {self.email or self.acct.address}")
+            return True
 
         logger.info(f"{self.email or self.acct.address} starting to vote for {len(links)} projects")
 
@@ -357,6 +377,7 @@ class MagicSquare(Web3Utils, MailUtils, Person):
         response = self.session.get(url, params=params)
 
         res = response.json()
+
         return res["id"], res["title"]
 
     def claim_daily_bonus(self):
@@ -376,3 +397,7 @@ class MagicSquare(Web3Utils, MailUtils, Person):
     @staticmethod
     def generate_password(k=10):
         return ''.join([choice(ascii_lowercase + digits) for _ in range(k)])
+
+    @staticmethod
+    def get_formatted_time():
+        return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z"

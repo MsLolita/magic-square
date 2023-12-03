@@ -65,9 +65,9 @@ class AutoReger:
             executor.map(self.register, accounts)
 
         if self.success:
-            logger.success(f"Successfully registered {self.success} accounts :)")
+            logger.success(f"Successfully handled {self.success} accounts :)")
         else:
-            logger.warning(f"No accounts registered :(")
+            logger.warning(f"No accounts handled :(")
 
     def register(self, account: tuple):
         magic_square = MagicSquare(*account)

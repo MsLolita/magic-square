@@ -4,3 +4,4 @@ from .file_manager import shift_file
 from .web3_utils import Web3Utils
 from .mailUtils import MailUtils
 from .person import Person
+from .captcha_service import CaptchaService
