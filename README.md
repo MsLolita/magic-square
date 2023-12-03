@@ -7,7 +7,7 @@
 ![image](https://github.com/FlorianREGAZ/Python-Tls-Client/assets/58307006/34c32a23-2476-40b1-90df-4ac029932139)
 
 ## You need to put: 
- 1. One captcha api token in inputs/config.py
+ 1. Captcha api token in inputs/config.py
 
     ![image](https://github.com/MsLolita/magic-square/assets/58307006/8453594d-02a3-4f46-9d40-b7b7ba563de3)
  2. (Optional) Emails (email:imap_pass) in inputs/emails.txt
