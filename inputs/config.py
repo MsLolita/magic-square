@@ -17,7 +17,7 @@ ANTICAPTCHA_API_KEY = ""
 CAPTCHA_PARAMS = {
     "captcha_type": "turnstile",
     "sitekey": "0x4AAAAAAAJXm3gxYL4NABDV",
-    "url": "https://magic.store/"
+    "url": "https://magic.store"
 }
 
 # left empty
