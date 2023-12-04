@@ -2,7 +2,7 @@ REFERRAL = "https://magic.store/raf/Ri8x7C2gsUb5yDioxe1Xmg"
 THREADS = 1  # Enter amount of threads
 CUSTOM_DELAY = 0  # delay before every registration in seconds
 
-IS_VERIFY_EMAIL = True
+IS_VERIFY_EMAIL = False
 IS_SNAPSHOT = True
 
 # left empty if you use static proxies from file proxies.txt
