@@ -17,7 +17,7 @@ class CaptchaService:
             "anticaptcha": ANTICAPTCHA_API_KEY,
         }
 
-        self.captcha_type = CAPTCHA_PARAMS.pop("captcha_type")
+        self.captcha_type = CAPTCHA_PARAMS.copy().pop("captcha_type")
 
     def get_captcha_token(self):
         service, api_key = self._parse_captcha_type()
