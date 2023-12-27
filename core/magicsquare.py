@@ -90,7 +90,7 @@ class MagicSquare(Web3Utils, MailUtils, Person):
         msg = (f"magic.store wants you to sign in with your Ethereum account:\n{self.acct.address}\n\n"
                f"Confirm authorization in magic.store with your account\n\nURI: https://magic.store\nVersion: 1\n"
                f"Chain ID: 1\nNonce: {self.get_nonce()}\nIssued At: {self.get_formatted_time()}")
-
+        # print(msg)
         json_data = {
             'pub_key': self.acct.address.lower(),
             'signature': self.get_signed_code(msg),
@@ -241,21 +241,36 @@ class MagicSquare(Web3Utils, MailUtils, Person):
     def vote(self, project_name: str):
         url = "https://magic.store/api/v2/validation/vote"
 
-        proposal, title = self.get_vote_id(project_name)
-        yes_or_no = random.choice([(1, "yes"), (2, "no")])
-        message = f'Vote ({yes_or_no[1]}) for {title} at Magic Store: {self.acct.address}'
+        app_id, app_link, proposal, title = self.get_vote_id(project_name)
+        # print(proposal, title)
+        yes_or_no = random.choice([('yes', 1), ('no', 2)])
+        message = (f'magic.store wants you to sign in with your Ethereum account:\n{self.acct.address}\n\nVote '
+                   f'({yes_or_no[0]}) for {title} at Magic Store\n\nURI: https://magic.store\nVersion: '
+                   f'1\nChain ID: 1\nNonce: {self.get_nonce()}\nIssued At: {self.get_formatted_time()}')
 
         signature = self.get_signed_code(message)
 
+        # json_data = {
+        #     'appLink': title,
+        #     'vote': yes_or_no[1],
+        #     'proposal': proposal,
+        #     'pubKey': self.acct.address.lower(),
+        #     'network': 'EVM',
+        #     'message': message,
+        #     'signature': signature,
+        # }
+
         json_data = {
-            'vote': yes_or_no[0],
+            'appLink': app_link,
+            'vote': yes_or_no[1],
+            'appId': app_id,
             'proposal': proposal,
             'pubKey': self.acct.address.lower(),
             'network': 'EVM',
             'message': message,
             'signature': signature,
         }
-
+        # print(json_data)
         response = self.session.post(url, json=json_data)
 
         return response.json()
@@ -366,19 +381,18 @@ class MagicSquare(Web3Utils, MailUtils, Person):
         return response.json()
 
     def get_vote_id(self, project_name: str):
-        url = 'https://magic.store/api/v1/main/validation/app'
+        url = f'https://magic.store/api/v2/store/application/{project_name}'
 
-        params = {
-            'id': project_name,
-            'limit': '30',
-            'offset': '0',
-        }
+        # params = {
+        #     'limit': '30',
+        #     'offset': '0',
+        # }
 
-        response = self.session.get(url, params=params)
+        response = self.session.get(url)
 
-        res = response.json()
+        res = response.json()["data"]["attributes"]
 
-        return res["id"], res["title"]
+        return response.json()["data"]["id"], res["appLink"], res["laseProposalId"], res["appName"]
 
     def claim_daily_bonus(self):
         pass
